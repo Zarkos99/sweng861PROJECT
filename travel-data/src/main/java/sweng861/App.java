@@ -42,29 +42,19 @@ public class App extends Application {
     return fxmlLoader.load();
   }
 
-  public static void main(String[] args) {
-    launch();
+  public static void main(String[] args) throws ResponseException {
 
-    // Acquiring API access token
-    // String api_key = "RjiHomRus5b6TGHtg78pmcYo6sf56cCR";
-    // String api_secret = "kYg46eokrVTc8CBI";
-    // String authorization_endpoint =
-    //     "https://test.api.amadeus.com/v1/security/oauth2/token";
-    // String authorization_body = "grant_type=client_credentials&client_id={" +
-    //                             api_key + "}&client_secret={" + api_secret +
-    //                             "}";
+    Amadeus amadeus =
+        Amadeus.builder("RjiHomRus5b6TGHtg78pmcYo6sf56cCR", "kYg46eokrVTc8CBI")
+            .build();
 
-    // HttpClient client = HttpClient.newHttpClient();
-    // HttpRequest request =
-    //     HttpRequest.newBuilder()
-    //         .uri(URI.create(authorization_endpoint))
-    //         .POST(HttpRequest.BodyPublishers.ofString(authorization_body))
-    //         .header("Content-Type", "application/x-www-form-urlencoded")
-    //         .build();
+    Location[] locations = amadeus.referenceData.locations.get(
+        Params.with("keyword", "LON").and("subType", Locations.ANY));
 
-    // HttpResponse<String> response =
-    //     client.send(request, HttpResponse.BodyHandlers.ofString());
+    for (Location location : locations) {
+      System.out.println(location.getResponse().getBody());
+    }
 
-    // System.out.println(response.toString());
+    // launch();    //launch GUI
   }
 }
