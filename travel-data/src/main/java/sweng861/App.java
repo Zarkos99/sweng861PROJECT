@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -47,10 +48,10 @@ public class App extends Application {
 
   private Scene initializeGrid() {
     GridPane grid = new GridPane();
-    grid.setAlignment(Pos.CENTER);
+    grid.setAlignment(Pos.TOP_LEFT);
     grid.setHgap(10);
     grid.setVgap(10);
-    grid.setPadding(new Insets(25, 25, 25, 25));
+    grid.setPadding(new Insets(10, 10, 10, 10));
 
     // Create the scene and title
     Scene scene = new Scene(grid, 800, 800);
@@ -59,22 +60,71 @@ public class App extends Application {
     grid.add(scenetitle, 0, 0, 2, 1);
 
     // Create text fields for string input
-    InputTextField input_text_field =
+    InputTextField departure_location_input =
         new InputTextField(grid, "Departure location:", 0, 1);
+    departure_location_input.setPromptText("Boston");
+
+    InputTextField destination_location_input =
+        new InputTextField(grid, "Destination location:", 0, 2);
+    destination_location_input.setPromptText("London");
+
+    InputTextField departure_date_input =
+        new InputTextField(grid, "Departure date:", 0, 3);
+    departure_date_input.setPromptText("YYYY-MM-DD");
+
+    InputTextField return_date_input =
+        new InputTextField(grid, "Return date:", 0, 4);
+    return_date_input.setPromptText("YYYY-MM-DD");
+
+    InputTextField num_adults_traveling_input =
+        new InputTextField(grid, "Number of adults traveling:", 0, 5);
+    num_adults_traveling_input.setPromptText("2");
+
+    InputTextField desired_num_results_input =
+        new InputTextField(grid, "Desired number of results:", 0, 6);
+    desired_num_results_input.setDefaultText("3");
 
     // Create button to initiate query for filtered travel data
-    Button btn = new Button("Calculate");
+    Button btn = new Button("Calculate flight data");
     HBox hbBtn = new HBox(10);
-    hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+    hbBtn.setAlignment(Pos.TOP_RIGHT);
     hbBtn.getChildren().add(btn);
-    grid.add(hbBtn, 1, 4);
+    grid.add(hbBtn, 6, 0);
 
-    final Text actiontarget = new Text();
-    grid.add(actiontarget, 1, 6);
+    OutputAccordion output_accordion = new OutputAccordion(grid);
     btn.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent e) {
-        System.out.println(input_text_field.getInputText());
+        // TODO: Initiate amadeus query and json parsing
+
+        // Clear all previous flight data output
+        output_accordion.removeAllPanes();
+
+        // Obtain the relevant amadeus information that was queried
+        FlightData flight_data = new FlightData();
+        flight_data.origin_location = departure_location_input.getText();
+        flight_data.destination_location = destination_location_input.getText();
+        flight_data.departure_date = departure_date_input.getText();
+        flight_data.return_date = return_date_input.getText();
+        try {
+          flight_data.number_of_adults =
+              Integer.parseInt(num_adults_traveling_input.getText());
+        } catch (NumberFormatException nfe) {
+          System.out.println(
+              "Invalid integer input for Number of adults traveling: " +
+              num_adults_traveling_input.getText());
+        }
+
+        // Generate TitledPanes for the accordion of output flight data and add
+        // it to the grid
+        for (Integer pane_num = 1;
+             pane_num <= Integer.parseInt(desired_num_results_input.getText());
+             pane_num++) {
+          output_accordion.addPane("Flight " + pane_num, flight_data);
+        }
+        VBox vbox_accordion = new VBox(output_accordion.getAccordion());
+        GridPane.setColumnSpan(vbox_accordion, GridPane.REMAINING);
+        grid.add(vbox_accordion, 0, 12);
       }
     });
 
