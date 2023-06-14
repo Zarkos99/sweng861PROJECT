@@ -21,8 +21,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import org.controlsfx.control.RangeSlider;
-
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.exceptions.ResponseException;
@@ -57,7 +55,7 @@ public class App extends Application {
     // grid.setGridLinesVisible(true);  //Can be uncommented for debugging
 
     // Create the scene and title
-    Scene scene = new Scene(grid, 800, 800);
+    Scene scene = new Scene(grid, 1000, 800);
     Text scene_title = new Text("Enter filter parameter data for flights");
     scene_title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
     grid.add(scene_title, 0, 0, 2, 1);
@@ -67,8 +65,6 @@ public class App extends Application {
         new InputTextField(grid, "Departure location:", 0, 1);
     departure_location_input.setPromptText("BOS");
     departure_location_input.setDefaultText("BOS");
-
-    RangeSlider slider = new RangeSlider(0, 1, 6, 1);
 
     InputTextField destination_location_input =
         new InputTextField(grid, "Destination location:", 0, 2);
@@ -90,6 +86,16 @@ public class App extends Application {
     num_travelers_input.setPromptText("2");
     num_travelers_input.setDefaultText("1");
 
+    InputTextField min_price_input =
+        new InputTextField(grid, "Minimum Price:", 2, 1);
+    min_price_input.setPromptText("10");
+    min_price_input.setDefaultText("1");
+
+    InputTextField max_price_input =
+        new InputTextField(grid, "Maximum Price:", 2, 2);
+    max_price_input.setPromptText("2000");
+    max_price_input.setDefaultText("2000");
+
     // Create a title for the output area
     Text results_title = new Text("Results:");
     results_title.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -97,7 +103,8 @@ public class App extends Application {
 
     InputTextField desired_num_results_input =
         new InputTextField(grid, "Desired number of results:", 0, 10);
-    desired_num_results_input.setDefaultText("3");
+    desired_num_results_input.setPromptText("10");
+    desired_num_results_input.setDefaultText("5");
 
     // Create button to initiate query for filtered travel data
     Button btn = new Button("Find flights");
@@ -115,50 +122,60 @@ public class App extends Application {
       public void handle(ActionEvent e) {
         // Clear all previous flight data output
         output_accordion.removeAllPanes();
+        Integer num_travelers = num_travelers_input.getInteger();
+        Integer desired_num_results = desired_num_results_input.getInteger();
+        Double min_price = min_price_input.getDouble();
+        Double max_price = max_price_input.getDouble();
+
+        Boolean valid_inputs = num_travelers > 0 && desired_num_results > 0 &&
+                               min_price > 0.0 && max_price > 0.0;
 
         // Query for flight data
-        FlightOfferSearch[] query_output = initiateAmadeusQuery(
-            departure_location_input.getText(),
-            destination_location_input.getText(),
-            departure_date_input.getText(), return_date_input.getText(),
-            num_travelers_input.getText(), desired_num_results_input.getText());
+        if (valid_inputs) {
+          FlightOfferSearch[] query_output = initiateAmadeusQuery(
+              departure_location_input.getText(),
+              destination_location_input.getText(),
+              departure_date_input.getText(), return_date_input.getText(),
+              num_travelers, desired_num_results);
 
-        if (query_output == null) {
-          Alert errorAlert = new Alert(AlertType.ERROR);
-          errorAlert.setHeaderText("Did not receive flight data.");
-          errorAlert.setContentText(
-              "Try different parameters and ensure all inputs match their initial prompt formats.");
-          errorAlert.showAndWait();
-        } else {
-          /* // Can be uncommented to debug the Amadeus query
-          for (FlightOfferSearch item : query_output) {
-            System.out.println(item.getResponse().getBody());
+          if (query_output == null) {
+            Alert errorAlert = new Alert(AlertType.ERROR);
+            errorAlert.setHeaderText("Did not receive flight data.");
+            errorAlert.setContentText(
+                "Try different parameters and ensure all inputs match their initial prompt formats.");
+            errorAlert.showAndWait();
+          } else {
+            /* // Can be uncommented to debug the Amadeus query
+            for (FlightOfferSearch item : query_output) {
+              System.out.println(item.getResponse().getBody());
+            }
+            */
+
+            // Generate TitledPanes for the accordion of output flight data
+            // and add it to the grid
+            for (Integer pane_num = 1;
+                 pane_num <=
+                 Integer.parseInt(desired_num_results_input.getText());
+                 pane_num++) {
+
+              // Obtain the relevant amadeus information that was queried
+              FlightData flight_data = new FlightData();
+              flight_data.grabFlightData(query_output[pane_num - 1]);
+
+              if (flight_data.getFlight_price() >= min_price &&
+                  flight_data.getFlight_price() <= max_price) {
+                // Create accordion panes with flight data and filter out by
+                // pricing info
+                output_accordion.addPane(departure_location_input.getText(),
+                                         destination_location_input.getText(),
+                                         flight_data);
+
+                VBox vbox_accordion = new VBox(output_accordion.getAccordion());
+                GridPane.setColumnSpan(vbox_accordion, 10);
+                grid.add(vbox_accordion, 0, 12);
+              }
+            }
           }
-          */
-
-          // Generate TitledPanes for the accordion of output flight data
-          // and add it to the grid
-          for (Integer pane_num = 1;
-               pane_num <=
-               Integer.parseInt(desired_num_results_input.getText());
-               pane_num++) {
-
-            // Obtain the relevant amadeus information that was queried
-            FlightData flight_data = new FlightData();
-            flight_data.grabFlightData(query_output[pane_num - 1]);
-            // Create accordion panes with flight data
-            // if (flight_data.getFlight_price() == )
-            String pane_title = "Flight " + flight_data.getFlight_id() + ":  " +
-                                departure_location_input.getText() + "(" +
-                                flight_data.getOrigin_location() + ") to " +
-                                destination_location_input.getText() + "(" +
-                                flight_data.getDestination_location() + ")";
-            output_accordion.addPane(pane_title, flight_data);
-          }
-
-          VBox vbox_accordion = new VBox(output_accordion.getAccordion());
-          GridPane.setColumnSpan(vbox_accordion, 10);
-          grid.add(vbox_accordion, 0, 12);
         }
       }
     });
@@ -178,29 +195,8 @@ public class App extends Application {
 
   private FlightOfferSearch[] initiateAmadeusQuery(
       String origin_location_code, String destination_location_code,
-      String departure_date, String return_date, String number_of_adults_input,
-      String number_of_results_input) {
-
-    Boolean valid_inputs = true;
-
-    Integer number_of_adults = 0;
-    try {
-      number_of_adults = Integer.parseInt(number_of_adults_input);
-    } catch (NumberFormatException nfe) {
-      valid_inputs = false;
-      System.out.println(
-          "Invalid integer input for number of adults traveling: " +
-          number_of_adults_input);
-    }
-
-    Integer number_of_results = 0;
-    try {
-      number_of_results = Integer.parseInt(number_of_results_input);
-    } catch (NumberFormatException nfe) {
-      valid_inputs = false;
-      System.out.println("Invalid integer input for number of results: " +
-                         number_of_results_input);
-    }
+      String departure_date, String return_date, Integer number_of_adults,
+      Integer number_of_results) {
 
     Amadeus amadeus =
         Amadeus.builder("RjiHomRus5b6TGHtg78pmcYo6sf56cCR", "kYg46eokrVTc8CBI")
@@ -208,18 +204,20 @@ public class App extends Application {
 
     // Flight Offers price
     FlightOfferSearch[] flightOffersSearches = null;
-    if (valid_inputs) {
-      try {
-        flightOffersSearches = amadeus.shopping.flightOffersSearch.get(
-            Params.with("originLocationCode", origin_location_code)
-                .and("destinationLocationCode", destination_location_code)
-                .and("departureDate", departure_date)
-                .and("returnDate", return_date)
-                .and("adults", number_of_adults)
-                .and("max", number_of_results));
-      } catch (ResponseException exception) {
-        System.out.println("Received response exception");
-      }
+    try {
+      flightOffersSearches = amadeus.shopping.flightOffersSearch.get(
+          Params.with("originLocationCode", origin_location_code)
+              .and("destinationLocationCode", destination_location_code)
+              .and("departureDate", departure_date)
+              .and("returnDate", return_date)
+              .and("adults", number_of_adults)
+              .and("max", number_of_results));
+    } catch (ResponseException exception) {
+      System.out.println("Received response exception");
+    }
+
+    if (flightOffersSearches != null) {
+      System.out.println("Successfully received amadeus query data.");
     }
     return flightOffersSearches;
   }

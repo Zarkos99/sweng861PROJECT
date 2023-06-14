@@ -24,7 +24,14 @@ class OutputAccordion {
     accordion.setMaxWidth(2000);
   }
 
-  public void addPane(String title, FlightData flight_data) {
+  public void addPane(String departure_location, String destination_location,
+                      FlightData flight_data) {
+    String title = "Flight " + flight_data.getFlight_id() + ":  " +
+                   departure_location + "(" + flight_data.getOrigin_location() +
+                   ") to " + destination_location + "(" +
+                   flight_data.getDestination_location() + ") Total Price: $" +
+                   flight_data.getFlight_price();
+
     TableView table = createFlightDataTable(flight_data);
     TitledPane pane = new TitledPane(title, table);
     accordion.getPanes().add(pane);
@@ -41,11 +48,12 @@ class OutputAccordion {
     createTableColumn(table, "Arrival Location", "Arrival_location");
     createTableColumn(table, "Departure Date", "Departure_date");
     createTableColumn(table, "Arrival Date", "Arrival_date");
-    createTableColumn(table, "Price", "Flight_price");
+    createTableColumn(table, "Duration", "Duration");
     createTableColumn(table, "Number Of Bookable Seats",
                       "Number_of_bookable_seats");
+    createTableColumn(table, "Airline", "Airline_code");
 
-    for (FlightSegmentData segment : flight_data.getFlightSegments()) {
+    for (FlightSegmentData segment : flight_data.getFlight_segments()) {
       table.getItems().add(segment);
     }
     return table;
