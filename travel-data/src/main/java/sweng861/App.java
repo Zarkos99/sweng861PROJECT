@@ -8,6 +8,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -118,33 +120,42 @@ public class App extends Application {
             num_adults_traveling_input.getText(),
             desired_num_results_input.getText());
 
-        /* // Can be uncommented to debug the Amadeus query
-        for (FlightOfferSearch item : query_output) {
-          System.out.println(item.getResponse().getBody());
+        if (query_output == null) {
+          Alert errorAlert = new Alert(AlertType.ERROR);
+          errorAlert.setHeaderText("Did not receive flight data.");
+          errorAlert.setContentText(
+              "Try different parameters and ensure all inputs match their initial prompt formats.");
+          errorAlert.showAndWait();
+        } else {
+          /* // Can be uncommented to debug the Amadeus query
+          for (FlightOfferSearch item : query_output) {
+            System.out.println(item.getResponse().getBody());
+          }
+          */
+
+          // Generate TitledPanes for the accordion of output flight data
+          // and add it to the grid
+          for (Integer pane_num = 1;
+               pane_num <=
+               Integer.parseInt(desired_num_results_input.getText());
+               pane_num++) {
+
+            // Obtain the relevant amadeus information that was queried
+            FlightData flight_data = new FlightData();
+            flight_data.grabFlightData(query_output[pane_num - 1]);
+            // Create accordion panes with flight data
+            String pane_title = "Flight " + flight_data.getFlight_id() + ":  " +
+                                departure_location_input.getText() + "(" +
+                                flight_data.getOrigin_location() + ") to " +
+                                destination_location_input.getText() + "(" +
+                                flight_data.getDestination_location() + ")";
+            output_accordion.addPane(pane_title, flight_data);
+          }
+
+          VBox vbox_accordion = new VBox(output_accordion.getAccordion());
+          GridPane.setColumnSpan(vbox_accordion, 10);
+          grid.add(vbox_accordion, 0, 12);
         }
-        */
-
-        // Generate TitledPanes for the accordion of output flight data
-        // and add it to the grid
-        for (Integer pane_num = 1;
-             pane_num <= Integer.parseInt(desired_num_results_input.getText());
-             pane_num++) {
-
-          // Obtain the relevant amadeus information that was queried
-          FlightData flight_data = new FlightData();
-          flight_data.grabFlightData(query_output[pane_num - 1]);
-          // Create accordion panes with flight data
-          String pane_title = "Flight " + flight_data.getFlight_id() + ":  " +
-                              departure_location_input.getText() + "(" +
-                              flight_data.getOrigin_location() + ") to " +
-                              destination_location_input.getText() + "(" +
-                              flight_data.getDestination_location() + ")";
-          output_accordion.addPane(pane_title, flight_data);
-        }
-
-        VBox vbox_accordion = new VBox(output_accordion.getAccordion());
-        GridPane.setColumnSpan(vbox_accordion, 10);
-        grid.add(vbox_accordion, 0, 12);
       }
     });
 
