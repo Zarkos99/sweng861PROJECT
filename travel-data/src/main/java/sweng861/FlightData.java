@@ -15,6 +15,7 @@ public class FlightData {
   private @Getter String origin_location;
   private @Getter String destination_location;
   private @Getter String flight_id;
+  private @Getter String flight_price;
   private @Getter Integer number_of_bookable_seats;
   private ArrayList<FlightSegmentData> flight_segments;
 
@@ -27,6 +28,7 @@ public class FlightData {
   public void grabFlightData(FlightOfferSearch query_data) {
     number_of_bookable_seats = query_data.getNumberOfBookableSeats();
     flight_id = query_data.getId();
+    flight_price = query_data.getPrice().getGrandTotal();
 
     for (SearchSegment segment : query_data.getItineraries()[0].getSegments()) {
       FlightSegmentData segment_data = new FlightSegmentData();

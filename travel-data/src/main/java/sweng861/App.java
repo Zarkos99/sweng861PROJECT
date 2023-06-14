@@ -21,6 +21,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import org.controlsfx.control.RangeSlider;
+
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.exceptions.ResponseException;
@@ -66,6 +68,8 @@ public class App extends Application {
     departure_location_input.setPromptText("BOS");
     departure_location_input.setDefaultText("BOS");
 
+    RangeSlider slider = new RangeSlider(0, 1, 6, 1);
+
     InputTextField destination_location_input =
         new InputTextField(grid, "Destination location:", 0, 2);
     destination_location_input.setPromptText("LON");
@@ -81,10 +85,10 @@ public class App extends Application {
     return_date_input.setPromptText("YYYY-MM-DD");
     return_date_input.setDefaultText("2023-06-20");
 
-    InputTextField num_adults_traveling_input =
-        new InputTextField(grid, "Number of adults traveling:", 0, 5);
-    num_adults_traveling_input.setPromptText("2");
-    num_adults_traveling_input.setDefaultText("1");
+    InputTextField num_travelers_input =
+        new InputTextField(grid, "Number of travelers:", 0, 5);
+    num_travelers_input.setPromptText("2");
+    num_travelers_input.setDefaultText("1");
 
     // Create a title for the output area
     Text results_title = new Text("Results:");
@@ -117,8 +121,7 @@ public class App extends Application {
             departure_location_input.getText(),
             destination_location_input.getText(),
             departure_date_input.getText(), return_date_input.getText(),
-            num_adults_traveling_input.getText(),
-            desired_num_results_input.getText());
+            num_travelers_input.getText(), desired_num_results_input.getText());
 
         if (query_output == null) {
           Alert errorAlert = new Alert(AlertType.ERROR);
@@ -144,6 +147,7 @@ public class App extends Application {
             FlightData flight_data = new FlightData();
             flight_data.grabFlightData(query_output[pane_num - 1]);
             // Create accordion panes with flight data
+            // if (flight_data.getFlight_price() == )
             String pane_title = "Flight " + flight_data.getFlight_id() + ":  " +
                                 departure_location_input.getText() + "(" +
                                 flight_data.getOrigin_location() + ") to " +
