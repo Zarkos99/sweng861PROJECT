@@ -46,6 +46,20 @@ public class App extends Application {
     stage.show();
   }
 
+  static void setRoot(String fxml) throws IOException {
+    scene.setRoot(loadFXML(fxml));
+  }
+
+  private static Parent loadFXML(String fxml) throws IOException {
+    FXMLLoader fxmlLoader =
+        new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+    return fxmlLoader.load();
+  }
+
+  /**
+   * Creates and formats the grid and all of it's child UI elements.
+   * @return
+   */
   private Scene createGrid() {
     GridPane grid = new GridPane();
     grid.setAlignment(Pos.TOP_LEFT);
@@ -162,10 +176,10 @@ public class App extends Application {
               FlightData flight_data = new FlightData();
               flight_data.grabFlightData(query_output[pane_num - 1]);
 
+              // Create accordion panes with flight data and filter out by
+              // pricing info
               if (flight_data.getFlight_price() >= min_price &&
                   flight_data.getFlight_price() <= max_price) {
-                // Create accordion panes with flight data and filter out by
-                // pricing info
                 output_accordion.addPane(departure_location_input.getText(),
                                          destination_location_input.getText(),
                                          flight_data);
@@ -183,16 +197,17 @@ public class App extends Application {
     return scene;
   }
 
-  static void setRoot(String fxml) throws IOException {
-    scene.setRoot(loadFXML(fxml));
-  }
-
-  private static Parent loadFXML(String fxml) throws IOException {
-    FXMLLoader fxmlLoader =
-        new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-    return fxmlLoader.load();
-  }
-
+  /**
+   * This method executes the Amadeus API get() query with all of the user-input
+   * parameters of filtration.
+   * @param origin_location_code
+   * @param destination_location_code
+   * @param departure_date
+   * @param return_date
+   * @param number_of_adults
+   * @param number_of_results
+   * @return
+   */
   private FlightOfferSearch[] initiateAmadeusQuery(
       String origin_location_code, String destination_location_code,
       String departure_date, String return_date, Integer number_of_adults,
@@ -221,8 +236,8 @@ public class App extends Application {
     }
     return flightOffersSearches;
   }
-  public static void main(String[] args) throws ResponseException {
 
+  public static void main(String[] args) throws ResponseException {
     launch(); // launch GUI
   }
 }
