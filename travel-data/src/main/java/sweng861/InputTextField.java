@@ -47,7 +47,10 @@ class InputTextField {
   }
 
   public void setPromptText(String text) { text_field.setPromptText(text); }
-  public void setDefaultText(String text) { text_field.setText(text); }
+  public void setDefaultText(String text) {
+    text_field.setText(text);
+    input_text = text;
+  }
   public String getText() { return input_text; }
 }
 ;

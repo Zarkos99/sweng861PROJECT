@@ -30,12 +30,13 @@ class OutputAccordion {
     TableView table = new TableView();
     table.setMaxHeight(MAX_HEIGHT_FOR_ONE_TABLE_CELL);
 
-    // Create columns of flight data
+    // Create columns of flight data using PropertyValueFactories based on the
+    // getters in FlightData.java
     createTableColumn(table, "Departure Location", "OriginLocation");
     createTableColumn(table, "Destination Location", "DestinationLocation");
     createTableColumn(table, "Departure Date", "DepartureDate");
     createTableColumn(table, "Return Date", "ReturnDate");
-    createTableColumn(table, "Number Of Adults", "NumberOfAdults");
+    createTableColumn(table, "Number Of Adults", "NumberOfBookableSeats");
 
     table.getItems().add(flight_data);
 
