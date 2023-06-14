@@ -9,8 +9,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+/**
+ * This class creates an accordion of formatted flight data to display to the
+ * user.
+ */
 class OutputAccordion {
-  private final Integer MAX_HEIGHT_FOR_ONE_TABLE_CELL = 61;
+  private final Integer MAX_HEIGHT_FOR_ONE_TABLE_CELL = 100;
   private Accordion accordion;
   private GridPane grid;
 
@@ -32,24 +36,26 @@ class OutputAccordion {
 
     // Create columns of flight data using PropertyValueFactories based on the
     // getters in FlightData.java
-    createTableColumn(table, "Departure Location", "OriginLocation");
-    createTableColumn(table, "Destination Location", "DestinationLocation");
+
+    createTableColumn(table, "Departure Location", "DepartureLocation");
+    createTableColumn(table, "Arrival Location", "ArrivalLocation");
     createTableColumn(table, "Departure Date", "DepartureDate");
-    createTableColumn(table, "Return Date", "ReturnDate");
-    createTableColumn(table, "Number Of Adults", "NumberOfBookableSeats");
-
-    table.getItems().add(flight_data);
-
+    createTableColumn(table, "Arrival Date", "ArrivalDate");
+    createTableColumn(table, "Number Of Bookable Seats",
+                      "NumberOfBookableSeats");
+    for (FlightSegmentData segment : flight_data.getFlightSegments()) {
+      table.getItems().add(segment);
+    }
     return table;
   }
 
-  private TableColumn<FlightData, String>
-  createTableColumn(TableView table, String column_name,
-                    String cell_value_name) {
-    TableColumn<FlightData, String> column = new TableColumn<>(column_name);
+  private void createTableColumn(TableView table, String column_name,
+                                 String cell_value_name) {
+    TableColumn<FlightSegmentData, String> column =
+        new TableColumn<FlightSegmentData, String>(column_name);
+    column.setStyle("-fx-alignment: CENTER;");
     column.setCellValueFactory(new PropertyValueFactory<>(cell_value_name));
     table.getColumns().add(column);
-    return column;
   }
 
   public void removeAllPanes() {

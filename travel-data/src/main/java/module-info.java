@@ -2,7 +2,8 @@
 module sweng861 {
   requires javafx.controls;
   requires javafx.fxml;
-  requires amadeus.java;
+  requires transitive amadeus.java;
+  requires com.google.gson;
 
   opens sweng861 to javafx.fxml;
   exports sweng861;
