@@ -134,9 +134,11 @@ public class App extends Application {
           FlightData flight_data = new FlightData();
           flight_data.grabFlightData(query_output[pane_num - 1]);
           // Create accordion panes with flight data
-          String pane_title = "Flight " + pane_num + ":  " +
-                              flight_data.getOriginLocation() + " to " +
-                              flight_data.getDestinationLocation();
+          String pane_title = "Flight " + flight_data.getFlight_id() + ":  " +
+                              departure_location_input.getText() + "(" +
+                              flight_data.getOrigin_location() + ") to " +
+                              destination_location_input.getText() + "(" +
+                              flight_data.getDestination_location() + ")";
           output_accordion.addPane(pane_title, flight_data);
         }
 

@@ -37,12 +37,14 @@ class OutputAccordion {
     // Create columns of flight data using PropertyValueFactories based on the
     // getters in FlightData.java
 
-    createTableColumn(table, "Departure Location", "DepartureLocation");
-    createTableColumn(table, "Arrival Location", "ArrivalLocation");
-    createTableColumn(table, "Departure Date", "DepartureDate");
-    createTableColumn(table, "Arrival Date", "ArrivalDate");
+    createTableColumn(table, "Departure Location", "Departure_location");
+    createTableColumn(table, "Arrival Location", "Arrival_location");
+    createTableColumn(table, "Departure Date", "Departure_date");
+    createTableColumn(table, "Arrival Date", "Arrival_date");
+    createTableColumn(table, "Price", "Flight_price");
     createTableColumn(table, "Number Of Bookable Seats",
-                      "NumberOfBookableSeats");
+                      "Number_of_bookable_seats");
+
     for (FlightSegmentData segment : flight_data.getFlightSegments()) {
       table.getItems().add(segment);
     }

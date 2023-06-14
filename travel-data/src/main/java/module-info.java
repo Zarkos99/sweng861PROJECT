@@ -4,6 +4,7 @@ module sweng861 {
   requires javafx.fxml;
   requires transitive amadeus.java;
   requires com.google.gson;
+  requires lombok;
 
   opens sweng861 to javafx.fxml;
   exports sweng861;
