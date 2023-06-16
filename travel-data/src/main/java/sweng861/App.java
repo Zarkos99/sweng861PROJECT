@@ -28,7 +28,10 @@ import com.amadeus.resources.FlightOfferSearch;
 
 /**
  * JavaFX App
- * TODO: Summary of function of this project
+ * This application creates a user interface to obtain filtration parameters to
+ * provide to an Amadeus get method in order to acquire real-time flight data.
+ * This flight data is filtered by the parameters provided by the user and
+ * output onto the UI screen for their analysis.
  *
  * @author Kostis Zarvis
  *

@@ -51,7 +51,9 @@ public class FlightData {
 
       origin_location = flight_segments.get(0).getDeparture_location();
       destination_location =
-          flight_segments.get(flight_segments.size() - 1).getArrival_location();
+          flight_segments
+              .get(query_data.getItineraries()[0].getSegments().length - 1)
+              .getArrival_location();
     }
   }
 }
