@@ -336,7 +336,7 @@ public class App extends Application {
     return inputs_valid;
   }
 
-  public static void main(String[] args) throws ResponseException {
+  public static void main(String[] args) {
     launch(); // launch GUI
   }
 }
